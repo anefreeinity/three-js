@@ -1,5 +1,7 @@
 import getPhongMaterial from "../material/BlinnPhong";
 import makeTextSprite from "../material/text/Text";
+import { ElementData } from "./ElementData";
+import { PanelElementTree } from "./PanelElementTree";
 
 export default function Panel(
   THREE,
@@ -29,41 +31,52 @@ export default function Panel(
   panelGroup.position.x = -width * 0.05;
   panelGroup.position.y = -height * 0.1;
 
-  drawPipeLine(
+  let points = [
+    new THREE.Vector3(-width / 2, -height / 2, 0),
+    new THREE.Vector3(-width / 2, height / 2, 0),
+  ];
+
+  let mainLine = drawPipeLine(
     THREE,
     panelGroup,
-    [
-      new THREE.Vector3(-width / 2, -height / 2, 0),
-      new THREE.Vector3(-width / 2, height / 2, 0),
-    ],
+    points,
     0x691515,
     "ml",
     textSize
   );
+
+  let element = new ElementData(THREE, panelGroup, points, mainLine);
+  let panleElements = new PanelElementTree(element, 0.03);
 
   let nodeCounter = 1;
   drawPipeRows();
   panelGroup.rotation.x = -Math.PI / 2.35;
   panelGroup.rotation.z = Math.PI / 3;
   scene.add(panelGroup);
+  return panleElements;
 
   function drawPipeRows() {
     let yInterval = (yMax + -1 * yMin) / nozRows;
-    let currYInterval = yMax;
+    let currYInterval = yMin;
     for (let s = 0; s <= nozRows; s++) {
       let selectionLabel = `s${s + 1}`;
       let rowLabel = `r${s + 1}`;
-      drawPipeLine(
+
+      let sPoints = [
+        new THREE.Vector3(xMin, currYInterval, zMin),
+        new THREE.Vector3(xMin, currYInterval, zMax),
+      ];
+      let sLine = drawPipeLine(
         THREE,
         panelGroup,
-        [
-          new THREE.Vector3(xMin, currYInterval, zMin),
-          new THREE.Vector3(xMin, currYInterval, zMax),
-        ],
+        sPoints,
         0x691515,
         selectionLabel,
         textSize
       );
+
+      let sElement = new ElementData(THREE, panelGroup, sPoints, sLine);
+      let sLevElement = panleElements.insert(sElement);
 
       drawNodes(
         THREE,
@@ -86,41 +99,55 @@ export default function Panel(
         textSize
       );
 
-      drawPipeLine(
+      let rPoints = [
+        new THREE.Vector3(xMin, currYInterval, zMax),
+        new THREE.Vector3(xMax, currYInterval, zMax),
+      ];
+      let rLine = drawPipeLine(
         THREE,
         panelGroup,
-        [
-          new THREE.Vector3(xMin, currYInterval, zMax),
-          new THREE.Vector3(xMax, currYInterval, zMax),
-        ],
+        rPoints,
         0x691515,
         rowLabel,
         textSize
       );
 
-      drawNozzles(s, currYInterval);
+      let rElement = new ElementData(THREE, panelGroup, rPoints, rLine);
+      let rLevElement = sLevElement.insert(rElement);
 
-      currYInterval -= yInterval;
+      drawNozzles(s, currYInterval, rLevElement);
+
+      currYInterval += yInterval;
     }
   }
 
-  function drawNozzles(s, currYInterval) {
+  function drawNozzles(s, currYInterval, rLevElement) {
     let xInterval = width / noOfNoz;
-    let currXInterval = xMax;
-    for (let n = 0; n < noOfNoz; n++) {
-      let nozzlePipeLabel = `np${n + 1}r${s + 1}`;
-      let nozzleLabel = `n${n + 1}r${s + 1}`;
-      drawPipeLine(
+    let currXInterval = xMin;
+    let isFirst = true;
+
+    for (let n = 0; n <= noOfNoz; n++) {
+      if (isFirst) {
+        currXInterval += xInterval;
+        isFirst = false;
+        continue;
+      }
+      let nozzlePipeLabel = `np${n}r${s + 1}`;
+      let nozzleLabel = `n${n}r${s + 1}`;
+
+      let nPoints = [
+        new THREE.Vector3(currXInterval, currYInterval, zMax),
+        new THREE.Vector3(currXInterval, currYInterval, zNoz),
+      ];
+      let nLine = drawPipeLine(
         THREE,
         panelGroup,
-        [
-          new THREE.Vector3(currXInterval, currYInterval, zMax),
-          new THREE.Vector3(currXInterval, currYInterval, zNoz),
-        ],
+        nPoints,
         0x0000ff,
         nozzlePipeLabel,
         textSize
       );
+
       drawNodes(
         THREE,
         panelGroup,
@@ -131,7 +158,8 @@ export default function Panel(
         `n${nodeCounter++}`,
         textSize
       );
-      drawNodes(
+
+      let nozzle = drawNodes(
         THREE,
         panelGroup,
         nozzleRadius,
@@ -142,17 +170,20 @@ export default function Panel(
         textSize,
         0x61edc8
       );
-      currXInterval -= xInterval;
+
+      let nElement = new ElementData(THREE, panelGroup, nPoints, nLine, nozzle);
+      let nLevElement = rLevElement.insert(nElement);
+      currXInterval += xInterval;
     }
   }
 }
 
-function drawPipeLine(
+export function drawPipeLine(
   THREE,
   panelGroup,
   points,
   color = 0x0000ff,
-  label = "A",
+  label = "",
   size = 1000
 ) {
   const material = new THREE.LineBasicMaterial({
@@ -175,6 +206,8 @@ function drawPipeLine(
   line.userData = { spritey: spritey, color: color, isClicked: false };
 
   panelGroup.add(line);
+
+  return line;
 }
 
 function drawNodes(
@@ -206,6 +239,8 @@ function drawNodes(
   sphear.add(spritey);
   sphear.userData = { spritey: spritey, color: color, isClicked: false };
   panelGroup.add(sphear);
+
+  return sphear;
 }
 
 export function removeLabel(scene) {

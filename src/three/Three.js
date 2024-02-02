@@ -13,7 +13,7 @@ import addControls from "../controls/OrbitControlsUtil";
 import Panel, { addLabel, removeLabel } from "../panal/Panel";
 import { SelectionBox } from "../controls/drag-selection/SelectionBox";
 import { SelectionHelper } from "../controls/drag-selection/SelectionHelper";
-import { getGuiController } from "../controls/Gui";
+import { disabled, enabled, getGuiController } from "../controls/Gui";
 
 let camDist = 10;
 let INTERSECTED;
@@ -88,7 +88,7 @@ function setUp(refContainer) {
   raycaster.params.Line.threshold = 0.25;
   const pointer = new THREE.Vector3();
 
-  Panel(THREE, scene, 4, 5, 16, 9);
+  let panleElements = Panel(THREE, scene, 4, 5, 16, 9);
   // Panel(THREE, scene);
   const color = 0xffffff;
   const intensity = 1;
@@ -106,32 +106,45 @@ function setUp(refContainer) {
   let planeSpecs = {
     Selection: false,
     DragToSelect: false,
+    WaterFlowAnimation: false,
   };
-
-  gui.add(planeSpecs, "Selection").onChange((value) => {
-    if (value) {
-      removeLabel(scene);
-      getGuiController(gui, planeSpecs, "DragToSelect").__li.style =
-        "opacity: 0.8; filter: grayscale(100%) blur(0.5px); pointer-events: none;";
-    } else {
-      addLabel(scene);
-      getGuiController(gui, planeSpecs, "DragToSelect").__li.style =
-        "opacity: 1; filter: grayscale(0%) blur(0px); pointer-events: auto;";
-    }
-  });
 
   selectionBox = new SelectionBox(camera, scene);
   helper = new SelectionHelper(renderer, "selectBox");
 
+  gui.add(planeSpecs, "Selection").onChange((value) => {
+    if (value) {
+      removeLabel(scene);
+      disabled(getGuiController(gui, planeSpecs, "DragToSelect"));
+      disabled(getGuiController(gui, planeSpecs, "WaterFlowAnimation"));
+    } else {
+      addLabel(scene);
+      enabled(getGuiController(gui, planeSpecs, "DragToSelect"));
+      enabled(getGuiController(gui, planeSpecs, "WaterFlowAnimation"));
+    }
+  });
+
   gui.add(planeSpecs, "DragToSelect").onChange((value) => {
     if (value) {
       removeLabel(scene);
-      getGuiController(gui, planeSpecs, "Selection").__li.style =
-        "opacity: 0.8; filter: grayscale(100%) blur(0.5px); pointer-events: none;";
+      disabled(getGuiController(gui, planeSpecs, "Selection"));
+      disabled(getGuiController(gui, planeSpecs, "WaterFlowAnimation"));
     } else {
       addLabel(scene);
-      getGuiController(gui, planeSpecs, "Selection").__li.style =
-        "opacity: 1; filter: grayscale(0%) blur(0px); pointer-events: auto;";
+      enabled(getGuiController(gui, planeSpecs, "Selection"));
+      enabled(getGuiController(gui, planeSpecs, "WaterFlowAnimation"));
+    }
+  });
+
+  gui.add(planeSpecs, "WaterFlowAnimation").onChange((value) => {
+    if (value) {
+      removeLabel(scene);
+      disabled(getGuiController(gui, planeSpecs, "DragToSelect"));
+      disabled(getGuiController(gui, planeSpecs, "Selection"));
+    } else {
+      addLabel(scene);
+      enabled(getGuiController(gui, planeSpecs, "DragToSelect"));
+      enabled(getGuiController(gui, planeSpecs, "Selection"));
     }
   });
 
@@ -140,6 +153,8 @@ function setUp(refContainer) {
   light3.position.set(0, 15, 0);
   scene.add(light3);
 
+  let hasAnimationStarted = false;
+  let hasAnimationEnded = false;
   var animate = function () {
     requestAnimationFrame(animate);
     renderer.render(scene, camera);
@@ -151,6 +166,20 @@ function setUp(refContainer) {
       controls.enabled = true;
       controls.update();
     }
+
+    if (planeSpecs.WaterFlowAnimation && !hasAnimationEnded) {
+      //console.log("animate");
+      panleElements.animation(true);
+      hasAnimationStarted = true;
+      hasAnimationEnded = panleElements.isAnimationCompleted();
+    } else if (!planeSpecs.WaterFlowAnimation) {
+      if (hasAnimationStarted) {
+        panleElements.removeAnimation();
+        hasAnimationStarted = false;
+        hasAnimationEnded = false;
+      }
+    }
+    //https://codepen.io/navin_moorthy/pen/qBWYORJ
   };
 
   if (WebGL.isWebGLAvailable()) {
@@ -197,6 +226,7 @@ function setUp(refContainer) {
   }
 
   function onClick(event) {
+    console.log(scene);
     onClickSelection(
       event,
       pointer,
