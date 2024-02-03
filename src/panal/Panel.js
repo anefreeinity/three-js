@@ -2,6 +2,7 @@ import getPhongMaterial from "../material/BlinnPhong";
 import makeTextSprite from "../material/text/Text";
 import { ElementData } from "./ElementData";
 import { PanelElementTree } from "./PanelElementTree";
+import { WaterDrip } from "./WaterDrip";
 
 export default function Panel(
   THREE,
@@ -171,7 +172,20 @@ export default function Panel(
         0x61edc8
       );
 
-      let nElement = new ElementData(THREE, panelGroup, nPoints, nLine, nozzle);
+      let dripDrop = new WaterDrip(
+        THREE,
+        nozzle,
+        zNoz - nozzleRadius,
+        (zNoz - nozzleRadius) / 2
+      );
+      let nElement = new ElementData(
+        THREE,
+        panelGroup,
+        nPoints,
+        nLine,
+        nozzle,
+        dripDrop
+      );
       let nLevElement = rLevElement.insert(nElement);
       currXInterval += xInterval;
     }

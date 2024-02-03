@@ -167,11 +167,11 @@ function setUp(refContainer) {
       controls.update();
     }
 
-    if (planeSpecs.WaterFlowAnimation && !hasAnimationEnded) {
+    if (planeSpecs.WaterFlowAnimation) {
       //console.log("animate");
       panleElements.animation(true);
       hasAnimationStarted = true;
-      hasAnimationEnded = panleElements.isAnimationCompleted();
+      //hasAnimationEnded = panleElements.isAnimationCompleted();
     } else if (!planeSpecs.WaterFlowAnimation) {
       if (hasAnimationStarted) {
         panleElements.removeAnimation();

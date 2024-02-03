@@ -110,6 +110,13 @@ class PanelElementTree {
       this.isCompleted = true;
     }
 
+    if (this.element.sphear && this.isCompleted) {
+      if (!this.element.waterDrip.rain.visible) {
+        this.element.waterDrip.rain.visible = true;
+      }
+      this.element.waterDrip.dripWater();
+    }
+
     for (let child of this.children) {
       if (
         this.isPointOnLineAndBetweenPoints(
@@ -124,6 +131,10 @@ class PanelElementTree {
   }
 
   removeAnimation() {
+    if (this.element.waterDrip && this.element.waterDrip.rain.visible) {
+      this.element.waterDrip.rain.visible = false;
+    }
+
     if (this.animationLine) {
       this.element.panelGroup.remove(this.animationLine);
       this.animationLine = null;
