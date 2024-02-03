@@ -5,7 +5,7 @@ class PanelElementTree {
     this.element = element;
     this.animationFactor = animationFactor;
     this.animationLine = null;
-    this.color = 0xfc03cf;
+    this.color = 0x0a45f5;
     this.count = 0;
     this.lineFactor = 0.03;
     this.isCompleted = false;
@@ -110,11 +110,21 @@ class PanelElementTree {
       this.isCompleted = true;
     }
 
-    if (this.element.sphear && this.isCompleted) {
-      if (!this.element.waterDrip.rain.visible) {
-        this.element.waterDrip.rain.visible = true;
+    if (this.element.sphear && this.isCompleted && this.element.waterDrip) {
+      if (this.element.sphear.userData.isClicked) {
+        if (!this.element.waterDrip.rain.visible) {
+          this.element.waterDrip.rain.visible = true;
+        }
+        this.element.waterDrip.dripWater();
+      } else {
+        if (this.element.waterDrip.rain.visible) {
+          this.element.waterDrip.rain.visible = false;
+        }
+
+        if (this.element.waterDrip && this.element.waterDrip.rain.visible) {
+          this.element.waterDrip.rain.visible = false;
+        }
       }
-      this.element.waterDrip.dripWater();
     }
 
     for (let child of this.children) {
@@ -133,6 +143,8 @@ class PanelElementTree {
   removeAnimation() {
     if (this.element.waterDrip && this.element.waterDrip.rain.visible) {
       this.element.waterDrip.rain.visible = false;
+      this.element.waterDrip.sphear.remove(this.element.waterDrip.rain);
+      this.element.waterDrip.isRainAdded = false;
     }
 
     if (this.animationLine) {

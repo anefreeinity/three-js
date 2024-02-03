@@ -144,7 +144,7 @@ export default function Panel(
         THREE,
         panelGroup,
         nPoints,
-        0x0000ff,
+        0x6a6b6a,
         nozzlePipeLabel,
         textSize
       );
@@ -169,7 +169,7 @@ export default function Panel(
         zNoz,
         nozzleLabel,
         textSize,
-        0x61edc8
+        0xfcc597
       );
 
       let dripDrop = new WaterDrip(
@@ -204,7 +204,7 @@ export function drawPipeLine(
     color: color,
   });
   //   console.log(material);
-  material.linewidth = 10.0;
+  material.linewidth = 3.0;
 
   const geometry = new THREE.BufferGeometry().setFromPoints(points);
   const line = new THREE.Line(geometry, material);

@@ -2,6 +2,8 @@ class WaterDrip {
   constructor(THREE, sphear, height = 2, radius = 0.5) {
     this.THREE = THREE;
     this.sphear = sphear;
+    this.isRainAdded = false;
+    this.color = 0x5395d4;
     this.size = height * 0.8;
     this.i = 40;
     this.j = 20;
@@ -44,14 +46,14 @@ class WaterDrip {
     );
 
     this.rainMaterial = new this.THREE.PointsMaterial({
-      color: 0xf2058b,
+      color: this.color,
       size: this.size,
       transparent: true,
     });
 
     this.rain = new this.THREE.Points(this.rainGeo, this.rainMaterial);
     this.rain.visible = false;
-    this.sphear.add(this.rain);
+    //this.sphear.add(this.rain);
   }
 
   generateRandom(min, max) {
@@ -59,6 +61,11 @@ class WaterDrip {
   }
 
   dripWater() {
+    if (!this.isRainAdded) {
+      this.sphear.add(this.rain);
+      this.isRainAdded = true;
+    }
+
     this.rainDropsCurrentPos = [];
     for (let i = 0; i < this.rainDrops.length; i++) {
       let currentPoint = new this.THREE.Vector3(

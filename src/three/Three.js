@@ -233,7 +233,7 @@ function setUp(refContainer) {
       raycaster,
       camera,
       scene,
-      planeSpecs.Selection
+      planeSpecs.Selection || planeSpecs.WaterFlowAnimation
     );
   }
 }
