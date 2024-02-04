@@ -130,7 +130,14 @@ export function onPointUp(event, selectionBox, helper) {
     0.5
   );
 
-  const allSelected = selectionBox.select();
+  let allSelected = [];
+  if (
+    selectionBox.startPoint.x !== selectionBox.endPoint.x ||
+    selectionBox.startPoint.y !== selectionBox.endPoint.y ||
+    selectionBox.startPoint.z !== selectionBox.endPoint.z
+  ) {
+    allSelected = selectionBox.select();
+  }
 
   for (let i = 0; i < allSelected.length; i++) {
     allSelected[i].material.color.setHex(0xf20fc5);
