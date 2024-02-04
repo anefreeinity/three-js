@@ -14,6 +14,7 @@ export function onHoverSelection(
     const intersects = rayCasterUtil(event, pointer, raycaster, camera, scene);
 
     if (intersects.length > 0) {
+      if (intersects[0].object.userData.isAnimation) return;
       if (intersects[0].object !== INTERSECTED) {
         if (INTERSECTED) {
           if (!INTERSECTED.userData.isClicked) {
@@ -54,6 +55,7 @@ export function onClickSelection(
     let color = 0xf20fc5;
 
     if (intersects.length > 0) {
+      if (intersects[0].object.userData.isAnimation) return;
       let obj = intersects[0].object;
       //console.log(obj);
       if (obj && obj.userData && obj.userData.isClicked) {

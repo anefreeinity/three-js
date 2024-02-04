@@ -52,6 +52,7 @@ class WaterDrip {
     });
 
     this.rain = new this.THREE.Points(this.rainGeo, this.rainMaterial);
+    this.rain.userData = { isAnimation: true };
     this.rain.visible = false;
     //this.sphear.add(this.rain);
   }

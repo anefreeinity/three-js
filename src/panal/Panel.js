@@ -217,7 +217,12 @@ export function drawPipeLine(
 
   spritey.position.set(x + 0.06, y + 0.06, z + 0.06);
   line.add(spritey);
-  line.userData = { spritey: spritey, color: color, isClicked: false };
+  line.userData = {
+    spritey: spritey,
+    color: color,
+    isClicked: false,
+    isAnimated: false,
+  };
 
   panelGroup.add(line);
 
@@ -251,7 +256,12 @@ function drawNodes(
   var spritey = makeTextSprite(THREE, label, size);
   spritey.position.set(0, 2 * rad + 0.06, rad + 0.06);
   sphear.add(spritey);
-  sphear.userData = { spritey: spritey, color: color, isClicked: false };
+  sphear.userData = {
+    spritey: spritey,
+    color: color,
+    isClicked: false,
+    isAnimated: false,
+  };
   panelGroup.add(sphear);
 
   return sphear;

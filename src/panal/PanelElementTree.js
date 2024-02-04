@@ -105,6 +105,8 @@ class PanelElementTree {
         this.color
       );
 
+      this.animationLine.userData.isAnimation = true;
+
       this.count++;
     } else {
       this.isCompleted = true;
